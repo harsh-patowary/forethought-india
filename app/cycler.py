@@ -1,8 +1,11 @@
 import requests
+from flask import Flask, render_template, request, url_for, flash, redirect
 import os
 from bs4 import BeautifulSoup
 
 class cycle:
+
+    
 
     def url_cycling(self):
         url = input("Enter the base URL: ")
