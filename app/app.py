@@ -1,4 +1,4 @@
-# from bcrypt import requests
+
 import requests
 from flask import Flask, render_template, request, url_for, flash, redirect
 from bs4 import BeautifulSoup
@@ -12,12 +12,31 @@ extractor_obj = extractor.extract()
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template("index.html")
+    if request.method == 'POST':
+        link = request.form.get('url')
+        mop_up(link)
+        print(link)
+        return render_template('index.html')
+
+    return render_template('index.html')
+    
 
 
-def mop_up():
+def mop_up(url):
+    print("Starting mop-up..........")
+    reqs = requests.get(url)
+    soup = BeautifulSoup(reqs.text, 'html.parser')
+
+     # file = open("/home/kali/scripts/mop-up/data/urls.csv", "w")
+
     urls = set()
-    urls = url_cycling()
+    urls.add(url)
+    print(urls)
+    for link in soup.find_all('a'):
+        urls.add(link.get('href'))
+    
+    urls = set()
+    
     emails = []
     for url in urls:
         
@@ -32,17 +51,17 @@ def mop_up():
             print(f"Empty links are links with null extracts")
 
 
-def url_cycling(self):
-        url = input("Enter the base URL: ")
-        reqs = requests.get(url)
-        soup = BeautifulSoup(reqs.text, 'lxml')
+# def url_cycling(url):
+#         # url = input("Enter the base URL: ")
+#         reqs = requests.get(url)
+#         soup = BeautifulSoup(reqs.text, 'lxml')
 
-        # file = open("/home/kali/scripts/mop-up/data/urls.csv", "w")
+#         # file = open("/home/kali/scripts/mop-up/data/urls.csv", "w")
 
-        urls = set()
-        urls.add(url)
-        print(urls)
-        for link in soup.find_all('a'):
-            urls.add(link.get('href'))
+#         urls = set()
+#         urls.add(url)
+#         print(urls)
+#         for link in soup.find_all('a'):
+#             urls.add(link.get('href'))
 
-        return urls
+#         return urls
