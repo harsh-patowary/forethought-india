@@ -1,12 +1,12 @@
 
 import requests
-from flask import Flask, render_template, request, url_for, flash, redirect
+from flask import Flask, send_file, render_template, request, url_for, flash, redirect
 from bs4 import BeautifulSoup
 import cycler
 import extractor
 
 app = Flask(__name__)
-# cycler_obj = cycler.cycle()
+cycler_obj = cycler.cycle()
 extractor_obj = extractor.extract()
 
 
@@ -14,54 +14,33 @@ extractor_obj = extractor.extract()
 def index():
     if request.method == 'POST':
         link = request.form.get('url')
-        mop_up(link)
         print(link)
+        index_urls = set()
+        index_urls = cycler_obj.url_cycling(link)
+        emails = []
+        for url in index_urls:
+        
+            emails = extractor_obj.email_extracting(url)
+            extractor_obj.write_file(emails, url)
+            if(len(emails)>0):
+                # print(emails)
+                print("**Crawl Successfull**")
+                
+                
+
+            else:
+                print(f"+Empty Link+ {url}+")
+                print(f"Empty links are links with null extracts")
+        
         return render_template('index.html')
 
     return render_template('index.html')
+
+@app.route('/download', methods=['GET', 'POST'])
+def download_file():
+	#path = "html2pdf.pdf"
+	#path = "info.xlsx"
+	#path = "simple.docx"
+	path = "data/emails.csv"
+	return send_file(path, as_attachment=True)
     
-
-
-def mop_up(url):
-    print("Starting mop-up..........")
-    reqs = requests.get(url)
-    soup = BeautifulSoup(reqs.text, 'html.parser')
-
-     # file = open("/home/kali/scripts/mop-up/data/urls.csv", "w")
-
-    urls = set()
-    urls.add(url)
-    print(urls)
-    for link in soup.find_all('a'):
-        urls.add(link.get('href'))
-    
-    urls = set()
-    
-    emails = []
-    for url in urls:
-        
-        emails = extractor_obj.email_extracting(url)
-        extractor_obj.write_file(emails, url)
-        if(len(emails)>0):
-            # print(emails)
-            print("**Crawl Successfull**")
-
-        else:
-            print(f"+Empty Link+ {url}+")
-            print(f"Empty links are links with null extracts")
-
-
-# def url_cycling(url):
-#         # url = input("Enter the base URL: ")
-#         reqs = requests.get(url)
-#         soup = BeautifulSoup(reqs.text, 'lxml')
-
-#         # file = open("/home/kali/scripts/mop-up/data/urls.csv", "w")
-
-#         urls = set()
-#         urls.add(url)
-#         print(urls)
-#         for link in soup.find_all('a'):
-#             urls.add(link.get('href'))
-
-#         return urls
