@@ -7,8 +7,8 @@ class cycle:
 
     
 
-    def url_cycling(self):
-        url = input("Enter the base URL: ")
+    def url_cycling(self, l):
+        url = l
         reqs = requests.get(url)
         soup = BeautifulSoup(reqs.text, 'lxml')
 
